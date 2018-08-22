@@ -73,11 +73,12 @@ public class Board {
 	 * @return int distance from where the index is supposed to be
 	 */
 	private int distance(int x, int y) {
-		if (val == -1) // empty space is being looked at
-			return 0;
 
 		int val = board[x][y] - 1;
 		int i = 0;
+
+		if (val == -1) // empty space is being looked at
+			return 0;
 
 		while (val >= length) {
 			i++;
@@ -103,7 +104,15 @@ public class Board {
 	 * @return boolean whether or not this board is the goal board
 	 */
 	public boolean isGoal() {
-		
+		int check = 1;
+
+		for (int i = 0; i < length; i++)
+			for (int j = 0; j < length; j++)
+				if (board[i][j] != check++)
+					if (!(i == j && i == length - 1)) // special case : it's the empty tile
+						return false;
+
+		return true;
 	}
 				
 	/**
@@ -133,22 +142,19 @@ public class Board {
 			board[i] = new int[3];
 		}
 
-		board[0][0] = 8;
-		board[0][1] = 1;
+		board[0][0] = 1;
+		board[0][1] = 2;
 		board[0][2] = 3;
 		board[1][0] = 4;
-		board[1][1] = 0;
-		board[1][2] = 2;
+		board[1][1] = 5;
+		board[1][2] = 6;
 		board[2][0] = 7;
-		board[2][1] = 6;
-		board[2][2] = 5;
+		board[2][1] = 8;
+		board[2][2] = 0;
 
 		Board test = new Board(board);
 
-		System.out.println(test);
-
-		for (int i = 0; i < 3; i++)
-			for (int j = 0; j < 3; j++)
-				System.out.println(board[i][j] + " : " + test.distance(i, j));
+		System.out.println(test.manhattan());
+		System.out.println(test.isGoal());
 	}
 }
