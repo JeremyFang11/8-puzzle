@@ -1,6 +1,7 @@
 /**
  * Board.java is a class representing the state
- * of an n-puzzle.
+ * of an n-puzzle board. The blank space is represented by
+ * 0.
  *
  * @author Jeremy Fang
  *
@@ -9,35 +10,14 @@
  * @date 8/21/2018
  */ 
 
+import java.util.Stack;
+
 public class Board {
 
-	private int[][] board;
-	private int length;
-	private int manhattanDistance;
-
-	/**
-	 * creates new instance of Board state
-	 * note : board size cannot be over 7 or under 3
-	 */
-	public Board(int n) {
-		if (n < 3 || n > 7)
-			throw new IllegalArgumentException("Error: No such thing as less than"
-				+ " 8-puzzle");
-
-		length = n;
-		board = new int[n][];
-		manhattanDistance = 0;
-
-		int count = 1;
-
-		for (int i = 0; i < n; i++) {
-			board[i] = new int[n];
-			for (int j = 0; j < n; j++)
-				board[i][j] = count++;
-		}
-
-		board[n - 1][n - 1] = 0;
-	}
+	private int[][] board; // 2-D int array representing board
+	private int length; // side length of board
+	private int manhattanDistance; // total manhattan distance of board
+	private int[] blank; // i and j values of the blank space in the board
 
 	/**
 	 * creates new instance of Board state
@@ -53,12 +33,18 @@ public class Board {
 		this.board = new int[board.length][];
 		length = board.length;
 		manhattanDistance = 0;
+		blank = new int[2];
 
 		for (int i = 0; i < board.length; i++) {
 			this.board[i] = new int[board.length];
 			for (int j = 0; j < board.length; j++) {
 				this.board[i][j] = board[i][j];
 				manhattanDistance += distance(i, j);
+
+				if (board[i][j] == 0) {
+					blank[0] = i;
+					blank[1] = j;
+				}
 			}
 		}
 	}
@@ -114,6 +100,84 @@ public class Board {
 
 		return true;
 	}
+
+	/**
+	 * checks first if the object is a a board object, if it's null
+	 * and finally if both boards have the same contents.
+	 *
+	 * @param other Object object being checked to see if it's equal 
+	 *			    to this board
+	 * @return boolean whether or not they are equal
+	 */
+	public boolean equals(Object other) {
+		if (!(other instanceof Board))
+			return false;
+		if (other == null)
+			return false;
+		else {
+			Board temp = (Board) other;
+
+			for (int i = 0; i < length; i++)
+				for (int j = 0; j < length; j++)
+					if (!(board[i][j] == temp.board[i][j]))
+						return false;
+
+			return true;
+		}
+
+	}
+
+	/**
+	 * individually checks all 4 possible moves to see if they are
+	 * possible in the current board. After checking if the move is
+	 * possible, it is added to the stack.
+	 *
+	 * @return Iterable<Board> stack containing all possible moves from 
+	 *		   this current board
+	 */
+	public Iterable<Board> findNeighbors() {
+		Stack<Board> result = new Stack<Board>();
+
+		if (blank[0] != 0) {
+			exch(blank[0], blank[1], blank[0] - 1, blank[1]);
+			result.push(new Board(board));
+			exch(blank[0], blank[1], blank[0] - 1, blank[1]);
+		}
+
+		if (blank[0] != length - 1) {
+			exch(blank[0], blank[1], blank[0] + 1, blank[1]);
+			result.push(new Board(board));
+			exch(blank[0], blank[1], blank[0] + 1, blank[1]);
+		}
+
+		if (blank[1] != 0) {
+			exch(blank[0], blank[1], blank[0], blank[1] - 1);
+			result.push(new Board(board));
+			exch(blank[0], blank[1], blank[0], blank[1] - 1);
+		}
+
+		if (blank[1] != length - 1) {
+			exch(blank[0], blank[1], blank[0], blank[1] + 1);
+			result.push(new Board(board));
+			exch(blank[0], blank[1], blank[0], blank[1] + 1);
+		}
+
+		return result;
+	}
+
+	/**
+	 * switches the values of board[i][j] and board[k][l]
+	 *
+	 * @param i x value of first index
+	 * @param j y value of first index
+	 * @param k x value of second index
+	 * @param l y value of second index
+	 */
+	private void exch(int i, int j, int k, int l) {
+		int temp = board[i][j];
+		board[i][j] = board[k][l];
+		board[k][l] = temp;
+	}
 				
 	/**
 	 * returns String representation of the board state
@@ -133,28 +197,5 @@ public class Board {
 		}
 
 		return result.toString();
-	}
-
-	public static void main(String[] args) {
-		int[][] board = new int[3][];
-
-		for (int i = 0; i < 3; i++) {
-			board[i] = new int[3];
-		}
-
-		board[0][0] = 1;
-		board[0][1] = 2;
-		board[0][2] = 3;
-		board[1][0] = 4;
-		board[1][1] = 5;
-		board[1][2] = 6;
-		board[2][0] = 7;
-		board[2][1] = 8;
-		board[2][2] = 0;
-
-		Board test = new Board(board);
-
-		System.out.println(test.manhattan());
-		System.out.println(test.isGoal());
 	}
 }
