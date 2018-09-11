@@ -66,11 +66,10 @@ public class MinPQ<E extends Comparable<E>> {
 	public void add(E val) {
 		if (val == null)
 			throw new IllegalArgumentException("Error: Null has been passed as arguement");
+		if (root == null)
+			root = new Node(val);
 		else
-			if (root == null)
-				root = new Node(val);
-			else
-				add(root, val);
+			add(root, val);
 		size++;
 	}
 
@@ -105,19 +104,18 @@ public class MinPQ<E extends Comparable<E>> {
 	public E removeMin() {
 		if (root == null)
 			return null;
-		else {
-			size--;
-			if (root.left == null) {
-				E val = root.val;
-				if (root.right == null)
-					root = null;
-				else
-					root = root.right;
-				return val;
-			}
+		
+		size--;
+		if (root.left == null) {
+			E val = root.val;
+			if (root.right == null)
+				root = null;
 			else
-				return removeMin(root);
-		}
+				root = root.right;
+			return val;
+			}
+		else
+			return removeMin(root);
 	}	
 
 	/**

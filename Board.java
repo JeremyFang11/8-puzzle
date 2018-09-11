@@ -50,6 +50,15 @@ public class Board {
 	}
 
 	/**
+	 * returns clone of this board
+	 *
+	 * @return Board clone of this board
+	 */
+	public Board clone() {
+		return new Board(board);
+	}
+
+	/**
 	 * helper function finds the manhattan distance from one index in the board
 	 * array to where the index is supposed to be
 	 * note : indexes are assumed to be in range
@@ -178,7 +187,29 @@ public class Board {
 		board[i][j] = board[k][l];
 		board[k][l] = temp;
 	}
-				
+
+	/**
+	 * returns a board with two of the pieces swapped places
+	 *
+	 * @return Board board with two pieces swapped
+	 */  
+	public Board twin() {
+		Board twin;
+
+		if (board[0][0] == 0) {
+			exch(0, 1, 0, 2);
+			twin = new Board(board);
+			exch(0, 1, 0, 2);
+		}
+		else {
+			exch(0, 0, 0, 1);
+			twin = new Board(board);
+			exch(0, 0, 0, 1);
+		}
+
+		return twin;
+	}
+					
 	/**
 	 * returns String representation of the board state
 	 *
@@ -197,5 +228,29 @@ public class Board {
 		}
 
 		return result.toString();
+	}
+
+	public static void main(String[] args) {
+		int[][] board = new int[3][];
+
+		for (int i = 0; i < 3; i++)
+			board[i] = new int[3];
+
+		board[0][0] = 1;
+		board[0][1] = 2;
+		board[0][2] = 3;
+		board[1][0] = 4;
+		board[1][1] = 5;
+		board[1][2] = 6;
+		board[2][0] = 7;
+		board[2][1] = 8;
+		board[2][2] = 0;
+
+		Board test = new Board(board);
+
+		Board test2 = test.twin();
+
+		System.out.println(test);
+		System.out.println(test2);
 	}
 }
