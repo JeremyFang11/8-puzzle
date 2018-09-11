@@ -13,7 +13,7 @@
 import java.util.Stack;
 import java.util.Iterator;
 
-public class Board implements Comparable<Board> {
+public class Board {
 
 	private int[][] board; // 2-D int array representing board
 	private int length; // side length of board
@@ -229,14 +229,5 @@ public class Board implements Comparable<Board> {
 		}
 
 		return result.toString();
-	}
-
-	public int compareTo(Board other) {
-		if (this.manhattanDistance > other.manhattanDistance)
-			return 1;
-		else if (this.manhattanDistance == other.manhattanDistance)
-			return 0;
-		else
-			return -1;
 	}
 }

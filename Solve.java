@@ -14,7 +14,7 @@ import java.util.Iterator;
 
 public class Solve {
 
-	// private State[] boards;
+	/* LinkedList will contain all boards that were already checked */ 
 	private LinkedList<Board> used;
 
 	/**
@@ -41,8 +41,8 @@ public class Solve {
 
 		/**
 		 * compares this state with another state. If this states
-		 * priority is lower, true is returned and this state is 
-		 * picked before other, if they are equal, 0 is returned and
+		 * priority is higher, 1 is returned and this state is 
+		 * picked after other, if they are equal, 0 is returned and
 		 * if other has lower priority -1 is returned
 		 *
 		 * @param other State other board state
@@ -62,25 +62,42 @@ public class Solve {
 	}
 
 	public Solve(Board board) {
-		MinPQ<State> pq = new MinPQ<State>();
+		MinPQ<State> pq = new MinPQ<State>(); // priority queue used for finding solution board
+		/* State variable used to find the lowest priority board in the queue.
+		 * initialized to null before the loop is started
+		 */
 		State min = null;
 		used = new LinkedList<Board>();
-		pq.add(new State(board, null, 0));
 
+		pq.add(new State(board, null, 0)); // add first board to the pq
+
+		/**
+		 * implementation of A* algorithm to find the shortest path from the input
+		 * board to the solution board
+		 */
 		while (min == null || (!pq.isEmpty() && !min.board.isGoal())) {
 			min = pq.removeMin();
 			Iterator<Board> neighbors = min.board.findNeighbors().iterator();
 			int depth = min.depth;
 
+			/**
+			 * iterates through the neighbors of the min board and checks to see if they
+			 * should be added to the queue
+			 **/
 			while (neighbors.hasNext()) {
 				Board checking = neighbors.next();
 
+				/**
+				 * checks the following conditions to see if the board should be added
+				 * 1. is it a repeat board from making a move and undoing it?
+				 * 2. has that board already been reached before with a shorter path?
+				 */ 
 				if (min.parent == null || min.parent.parent == null || !checking.equals(min.parent.parent.board))
 					if (!used.contains(checking))
 						pq.add(new State(checking, min, depth + 1));
 			}
 
-			used.add(min.board);
+			used.add(min.board); // adds that board that was just checked to the used boards
 		}
 
 		System.out.println(min.board);
