@@ -163,5 +163,4 @@ public class MinPQ<E extends Comparable<E>> {
 		else
 			return min(current.left);
 	}
-
 }

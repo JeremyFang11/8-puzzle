@@ -9,7 +9,13 @@
  * @date 9/10/2018
  */
 
+import java.util.LinkedList;
+import java.util.Iterator;
+
 public class Solve {
+
+	// private State[] boards;
+	private LinkedList<Board> used;
 
 	/**
 	 * inner class represents search node when looking for solution.
@@ -20,7 +26,18 @@ public class Solve {
 	private static class State implements Comparable<State> {
 		private Board board; // state of board stored in node
 		private State parent; // parent of this board state
-		private int priority; // manhattan priority + move
+		private int depth; // number of moves made already
+
+
+		/**
+		 * initializes the state with the input variables of the same 
+		 * name
+		 */
+		private State(Board board, State parent, int depth) {
+			this.board = board;
+			this.parent = parent;
+			this.depth = depth;
+		}
 
 		/**
 		 * compares this state with another state. If this states
@@ -32,12 +49,61 @@ public class Solve {
 		 * @return int compares this state and the input state
 		 */
 		public int compareTo(State other) {
-			if (this.priority < other.priority)
+			int tprio = this.depth + this.board.manhattan();
+			int oprio = other.depth + other.board.manhattan();
+
+			if (tprio > oprio)
 				return 1;
-			else if (this.priority == other.priority)
+			else if (tprio == oprio)
 				return 0;
 			else
 				return -1;
 		}
+	}
+
+	public Solve(Board board) {
+		MinPQ<State> pq = new MinPQ<State>();
+		State min = null;
+		used = new LinkedList<Board>();
+		pq.add(new State(board, null, 0));
+
+		while (min == null || (!pq.isEmpty() && !min.board.isGoal())) {
+			min = pq.removeMin();
+			Iterator<Board> neighbors = min.board.findNeighbors().iterator();
+			int depth = min.depth;
+
+			while (neighbors.hasNext()) {
+				Board checking = neighbors.next();
+
+				if (min.parent == null || min.parent.parent == null || !checking.equals(min.parent.parent.board))
+					if (!used.contains(checking))
+						pq.add(new State(checking, min, depth + 1));
+			}
+
+			used.add(min.board);
+		}
+
+		System.out.println(min.board);
+	}
+
+	public static void main(String[] args) {
+		int[][] board = new int[3][];
+
+		for (int i = 0; i < 3; i++)
+			board[i] = new int[3];
+
+		board[0][0] = 8;
+		board[0][1] = 6;
+		board[0][2] = 7;
+		board[1][0] = 2;
+		board[1][1] = 5;
+		board[1][2] = 4;
+		board[2][0] = 3;
+		board[2][1] = 0;
+		board[2][2] = 1;
+
+		Board test = new Board(board);
+		Solve t = new Solve(test);
+
 	}
 }

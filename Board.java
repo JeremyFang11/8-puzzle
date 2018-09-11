@@ -11,8 +11,9 @@
  */ 
 
 import java.util.Stack;
+import java.util.Iterator;
 
-public class Board {
+public class Board implements Comparable<Board> {
 
 	private int[][] board; // 2-D int array representing board
 	private int length; // side length of board
@@ -230,27 +231,12 @@ public class Board {
 		return result.toString();
 	}
 
-	public static void main(String[] args) {
-		int[][] board = new int[3][];
-
-		for (int i = 0; i < 3; i++)
-			board[i] = new int[3];
-
-		board[0][0] = 1;
-		board[0][1] = 2;
-		board[0][2] = 3;
-		board[1][0] = 4;
-		board[1][1] = 5;
-		board[1][2] = 6;
-		board[2][0] = 7;
-		board[2][1] = 8;
-		board[2][2] = 0;
-
-		Board test = new Board(board);
-
-		Board test2 = test.twin();
-
-		System.out.println(test);
-		System.out.println(test2);
+	public int compareTo(Board other) {
+		if (this.manhattanDistance > other.manhattanDistance)
+			return 1;
+		else if (this.manhattanDistance == other.manhattanDistance)
+			return 0;
+		else
+			return -1;
 	}
 }
