@@ -14,8 +14,10 @@ import java.util.Iterator;
 
 public class Solve {
 
-	/* LinkedList will contain all boards that were already checked */ 
-	private LinkedList<Board> used;
+	/* LinkedList will contain all boards that were already checked 
+	 * in the normal board and the twin
+	 */ 
+	private LinkedList<Board> used, tused;
 
 	/**
 	 * inner class represents search node when looking for solution.
@@ -69,16 +71,23 @@ public class Solve {
 		State min = null;
 		used = new LinkedList<Board>();
 
+		MinPQ<State> tpq = new MinPQ<State>(); // pq that uses twin of input board
+		State tmin = null;
+		tused = new LinkedList<Board>();
+
 		pq.add(new State(board, null, 0)); // add first board to the pq
+		tpq.add(new State(board.twin(), null, 0)); // add first twin board to the pq
 
 		/**
 		 * implementation of A* algorithm to find the shortest path from the input
 		 * board to the solution board
 		 */
-		while (min == null || (!pq.isEmpty() && !min.board.isGoal())) {
+		while (min == null || (!min.board.isGoal() && !tmin.board.isGoal())) {
 			min = pq.removeMin();
 			Iterator<Board> neighbors = min.board.findNeighbors().iterator();
 			int depth = min.depth;
+
+			tmin = tpq.removeMin();
 
 			/**
 			 * iterates through the neighbors of the min board and checks to see if they
@@ -98,6 +107,24 @@ public class Solve {
 			}
 
 			used.add(min.board); // adds that board that was just checked to the used boards
+
+			/**
+			 * runs algorithm on twin of the initial board as well. This is because
+			 * when any two pieces(not the blank) in an 8-puzzle are swapped, the puzzle becomes
+			 * solvable if it was unsolvable and vice versa
+			 */
+			neighbors = tmin.board.findNeighbors().iterator();
+			depth = tmin.depth;
+
+			while (neighbors.hasNext()) {
+				Board checking = neighbors.next();
+
+				if (tmin.parent == null || min.parent.parent == null || !checking.equals(tmin.parent.parent.board))
+					if (!tused.contains(checking))
+						tpq.add(new State(checking, tmin, depth + 1));
+			}
+
+			tused.add(tmin.board);
 		}
 
 		System.out.println(min.board);
