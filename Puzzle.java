@@ -13,6 +13,8 @@
  */
 
 import java.lang.Math;
+import java.util.LinkedList;
+import java.util.Scanner;
 import java.util.Iterator;
 
 public class Puzzle {
@@ -21,13 +23,8 @@ public class Puzzle {
 	private Board board; // current board being used in game
 	private int moves;
 
-	/**
-	 * initializes a new puzzle. Creates a new random board using the input
-	 * and sets moves made to 0
-	 */
 	public Puzzle(int length) {
 		boardLength = length;
-		board = generateBoardArray();
 		moves = 0;
 	}
 
@@ -72,8 +69,6 @@ public class Puzzle {
 
 		result = new Board(board);
 
-		System.out.println(result);
-
 		solution = new Solve(result);
 
 		// if the board generated was solvable, return it. Otherwise, return a twin of the board
@@ -81,6 +76,68 @@ public class Puzzle {
 			return result;
 
 		return result.twin();
+	}
+
+	/**
+	 * Allows user to play game.
+	 */
+	public void play() {
+		Scanner scan = new Scanner(System.in);
+		LinkedList<Integer> movesList; // LinkedList of available moves
+		Iterator<Integer> iterate; // iterator of available moves
+		boolean validMove = false; // checks if move is valid every loop
+		int[] moveIndex;
+		int moveMade = 0; // number at index to be swapped with blank
+
+		System.out.println("[8-Puzzle Game]");
+		System.out.print("press enter to start...");
+
+		scan.nextLine();
+
+		System.out.print("\nA board will now be generated. It will be represented by a 3x3 " +
+						   "square of numbers, with the '0' representing the blank space that " +
+						   "is moved around.\nEvery move, the number of moves you've made will be " +
+						   "displayed along with the number pieces that are movable with the current " +
+						   "state of the board.\nPress enter to continue...");
+
+		board = generateBoardArray(); // generates new solvable board
+
+		scan.nextLine();
+
+		System.out.println("\nThe following board is solvable and was randomly generated :");
+		System.out.println("moves = 0\n" + board);
+
+		while (!board.isGoal()) {
+			System.out.println("The following moves are currently available, please enter the number " + 
+						   	   "corresponding to the move you want to make :");
+
+			validMove = false;
+			movesList = getMoves();
+
+			showMoves(movesList); // displays available moves
+
+			while (!validMove) { // continuous loop until a valid move is made
+				moveMade = Integer.parseInt(scan.nextLine());
+
+				if (movesList.contains(moveMade)) {
+					System.out.print("A valid move [" + moveMade + "] has been made. Press enter to continue...");
+					validMove = true;
+				}
+				else {
+					System.out.println("[INVALID INPUT] Please enter one of the following valid moves :");
+					showMoves(movesList);
+				}
+			}
+
+			moveIndex = convertNumberToIndexes(moveMade); // gets indexes for the piece that is being moved
+
+			scan.nextLine();
+
+			board.move(moveIndex[0], moveIndex[1]); // moves the piece represented by moveIndex to the blank space
+			moves++;
+
+			System.out.println("Board following move :\nmoves = " + moves + "\n" + board);
+		}
 	}
 
 	/**
@@ -98,5 +155,84 @@ public class Puzzle {
 		arr[j] = temp;
 
 		return arr;
+	}
+
+	/**
+	 * void method that displays the contents of input list. Is
+	 * used to display the possible moves for the board at every loop
+	 *
+	 * @param list LinkedList<Integer> list of possible moves
+	 */ 
+	private void showMoves(LinkedList<Integer> list) {
+		StringBuilder result = new StringBuilder();
+		Iterator<Integer> iterate = list.iterator();
+
+		while (iterate.hasNext())
+			result.append(" [" + iterate.next() + "]\t");
+
+		System.out.println(result.toString());
+	}
+
+	/**
+	 * returns LinkedList containing the integer values of the piece to be swapped with
+	 * the blank spot
+	 *
+	 * @return LinkedList<Integer> stack containing all possible moves
+	 */
+	private LinkedList<Integer> getMoves() {
+		LinkedList<Integer> result = new LinkedList<Integer>();
+		int[] blank = board.getBlankIndex(); // indexes of blank spot on board
+
+		if (blank[0] != 0)
+			result.add(board.getIndex(blank[0] - 1, blank[1]));
+		if (blank[0] != boardLength - 1)
+			result.add(board.getIndex(blank[0] + 1, blank[1]));
+		if (blank[1] != 0)
+			result.add(board.getIndex(blank[0], blank[1] - 1));
+		if (blank[1] != boardLength - 1)
+			result.add(board.getIndex(blank[0], blank[1] + 1));
+
+		return result;
+	}
+
+	/**
+	 * returns a 2 element array that contains the indexes of 
+	 * the board piece with the value num.
+	 *
+	 * @param num int input number
+	 * @return int[] 2 element array that contains indexes 
+	 *		   of piece with value num
+	 */
+	private int[] convertNumberToIndexes(int num) {
+		int[] indexes = new int[2], blank = board.getBlankIndex();
+
+		if (blank[0] != 0)
+			if (board.getIndex(blank[0] - 1, blank[1]) == num) {
+				indexes[0] = blank[0] - 1;
+				indexes[1] = blank[1];
+			}
+		if (blank[0] != boardLength - 1)
+			if (board.getIndex(blank[0] + 1, blank[1]) == num) {
+				indexes[0] = blank[0] + 1;
+				indexes[1] = blank[1];
+			}
+		if (blank[1] != 0)
+			if (board.getIndex(blank[0], blank[1] - 1) == num) {
+				indexes[0] = blank[0];
+				indexes[1] = blank[1] - 1;
+			}
+		if (blank[1] != boardLength - 1)
+			if (board.getIndex(blank[0], blank[1] + 1) == num) {
+				indexes[0] = blank[0];
+				indexes[1] = blank[1] + 1;
+			}
+
+		return indexes;
+	}
+
+	public static void main(String[] args) {
+		Puzzle test = new Puzzle(3);
+
+		test.play();
 	}
 }

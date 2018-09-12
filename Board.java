@@ -230,6 +230,27 @@ public class Board {
 	public int getLength() {
 		return length;
 	}
+
+	/**
+	 * getter for the value of any index on the board
+	 *
+	 * @param i x index
+	 * @param j y index
+	 * @return int value at board[i][j]
+	 */
+	public int getIndex(int i, int j) {
+		return board[i][j];
+	}
+
+	/**
+	 * returns 2 element array containing the i and j 
+	 * indexes of the blank space
+	 *
+	 * @return int[] 2 element array containing indexes of blank
+	 */
+	public int[] getBlankIndex() {
+		return blank;
+	}
 					
 	/**
 	 * returns String representation of the board state
@@ -238,6 +259,7 @@ public class Board {
 	 */
 	public String toString() {
 		StringBuilder result = new StringBuilder();
+		result.append("   ");
 
 		for (int i = 0; i < length; i++) {
 			for (int j = 0; j < length; j++)
@@ -245,31 +267,9 @@ public class Board {
 					result.append(" " + board[i][j] + " ");
 				else
 					result.append(board[i][j] + " ");
-			result.append("\n");
+			result.append("\n   ");
 		}
 
 		return result.toString();
-	}
-
-	public static void main(String[] args) {
-		int[][] board = new int[3][];
-
-		for (int i = 0; i < 3; i++)
-			board[i] = new int[3];
-
-		board[0][0] = 6;
-		board[0][1] = 10;
-		board[0][2] = 8;
-		board[1][0] = 4;
-		board[1][1] = 3;
-		board[1][2] = 5;
-		board[2][0] = 1;
-		board[2][1] = 2;
-		board[2][2] = 7;
-
-		Board test = new Board(board);
-
-		System.out.println(test);
-		System.out.println(test.twin());
 	}
 }
