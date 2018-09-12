@@ -85,8 +85,10 @@ public class Puzzle {
 		Scanner scan = new Scanner(System.in);
 		LinkedList<Integer> movesList; // LinkedList of available moves
 		Iterator<Integer> iterate; // iterator of available moves
-		boolean validMove = false; // checks if move is valid every loop
+		Iterator<Board> solutionIterator; // iterator for sequence of moves to solution
+		boolean validMove = false, showSolution = false; // checks if move is valid every loop and check if the player gives up
 		int[] moveIndex;
+		Solve solution; // Solve class used to find solution
 		int moveMade = 0; // number at index to be swapped with blank
 
 		System.out.println("[8-Puzzle Game]");
@@ -98,7 +100,8 @@ public class Puzzle {
 						   "square of numbers, with the '0' representing the blank space that " +
 						   "is moved around.\nEvery move, the number of moves you've made will be " +
 						   "displayed along with the number pieces that are movable with the current " +
-						   "state of the board.\nPress enter to continue...");
+						   "state of the board.\nTo show shortest path from current board solution, " +
+						   "enter -1 as your move.\nPress enter to continue...");
 
 		board = generateBoardArray(); // generates new solvable board
 
@@ -107,7 +110,7 @@ public class Puzzle {
 		System.out.println("\nThe following board is solvable and was randomly generated :");
 		System.out.println("moves = 0\n" + board);
 
-		while (!board.isGoal()) {
+		while (!board.isGoal() && !showSolution) {
 			System.out.println("The following moves are currently available, please enter the number " + 
 						   	   "corresponding to the move you want to make :");
 
@@ -116,10 +119,12 @@ public class Puzzle {
 
 			showMoves(movesList); // displays available moves
 
-			while (!validMove) { // continuous loop until a valid move is made
+			while (!validMove && !showSolution) { // continuous loop until a valid move is made
 				moveMade = Integer.parseInt(scan.nextLine());
 
-				if (movesList.contains(moveMade)) {
+				if (moveMade == -1) 
+					showSolution = true;
+				else if (movesList.contains(moveMade)) {
 					System.out.print("A valid move [" + moveMade + "] has been made. Press enter to continue...");
 					validMove = true;
 				}
@@ -129,14 +134,30 @@ public class Puzzle {
 				}
 			}
 
-			moveIndex = convertNumberToIndexes(moveMade); // gets indexes for the piece that is being moved
+			if (!showSolution) {
+				moveIndex = convertNumberToIndexes(moveMade); // gets indexes for the piece that is being moved
+
+				scan.nextLine();
+
+				board.move(moveIndex[0], moveIndex[1]); // moves the piece represented by moveIndex to the blank space
+				moves++;
+
+				System.out.println("Board following move :\nmoves = " + moves + "\n" + board);
+			}
+		}
+
+		if (showSolution) {
+			solution = new Solve(board);
+			solutionIterator = solution.getSequence().iterator();
+			System.out.print("The solution from this board to the goal board is " + solution.getSolutionLength()
+								+ " moves.\nPress enter to show...");
 
 			scan.nextLine();
 
-			board.move(moveIndex[0], moveIndex[1]); // moves the piece represented by moveIndex to the blank space
-			moves++;
-
-			System.out.println("Board following move :\nmoves = " + moves + "\n" + board);
+			while (solutionIterator.hasNext()) {
+				System.out.println("moves = " + moves + "\n" + solutionIterator.next());
+				moves++;
+			}
 		}
 	}
 

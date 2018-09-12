@@ -183,28 +183,39 @@ e		 * @return int compares this state and the input state
 		return sequence;
 	}
 
+	/**
+	 * returns the number of moves needed to go from the board to 
+	 * the solution board
+	 *
+	 * @return int number of moves needed to find solution
+	 */
+	public int getSolutionLength() {
+		return sequence.size() - 1;
+	}
+
 	public static void main(String[] args) {
 		int[][] board = new int[3][];
 
 		for (int i = 0; i < 3; i++)
 			board[i] = new int[3];
 
-		board[0][0] = 6;
-		board[0][1] = 0;
+		board[0][0] = 5;
+		board[0][1] = 4;
 		board[0][2] = 8;
-		board[1][0] = 4;
-		board[1][1] = 3;
-		board[1][2] = 5;
-		board[2][0] = 1;
-		board[2][1] = 2;
-		board[2][2] = 7;
+		board[1][0] = 2;
+		board[1][1] = 0;
+		board[1][2] = 3;
+		board[2][0] = 7;
+		board[2][1] = 1;
+		board[2][2] = 6;
 
 		Board test = new Board(board);
-		Solve t = new Solve(test);
+		Solve solve = new Solve(test);
 
-		Iterator<Board> s = t.getSequence().iterator();
+		System.out.println(solve.isSolvable());
+		System.out.println(test);
+		test.move(0, 1);
+		System.out.println(test);
 
-		while (s.hasNext())
-			System.out.println(s.next());
 	}
 }

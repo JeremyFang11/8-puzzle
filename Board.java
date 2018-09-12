@@ -220,6 +220,9 @@ public class Board {
 		if (j == blank[1])
 			if (i == blank[0] + 1 || i == blank[0] - 1)
 				exch(blank[0], blank[1], i, j);
+
+		blank[0] = i;
+		blank[1] = j;
 	}
 
 	/**
@@ -271,5 +274,28 @@ public class Board {
 		}
 
 		return result.toString();
+	}
+
+	public static void main(String[] args) {
+		int[][] board = new int[3][];
+
+		for (int i = 0; i < 3; i++)
+			board[i] = new int[3];
+
+		board[0][0] = 5;
+		board[0][1] = 4;
+		board[0][2] = 8;
+		board[1][0] = 2;
+		board[1][1] = 0;
+		board[1][2] = 3;
+		board[2][0] = 7;
+		board[2][1] = 1;
+		board[2][2] = 6;
+
+		Board test = new Board(board);
+
+		test.move(0, 1);
+
+		System.out.println(test);
 	}
 }
