@@ -51,15 +51,6 @@ public class Board {
 	}
 
 	/**
-	 * returns clone of this board
-	 *
-	 * @return Board clone of this board
-	 */
-	public Board clone() {
-		return new Board(board);
-	}
-
-	/**
 	 * helper function finds the manhattan distance from one index in the board
 	 * array to where the index is supposed to be
 	 * note : indexes are assumed to be in range
@@ -197,18 +188,47 @@ public class Board {
 	public Board twin() {
 		Board twin;
 
-		if (board[0][0] == 0) {
-			exch(0, 1, 0, 2);
-			twin = new Board(board);
-			exch(0, 1, 0, 2);
+		if (blank[0] != 0) {// the blank is not of the first row
+			exch(0, 0, 0, 1);
+			twin = new Board(board.clone());
+			exch(0, 0, 0, 1);
 		}
-		else {
-			exch(0, 0, 0, 1);
-			twin = new Board(board);
-			exch(0, 0, 0, 1);
+		else {// the blank is on the first row
+			exch(1, 0, 1, 1);
+			twin = new Board(board.clone());
+			exch(1, 0, 1, 1);
 		}
 
 		return twin;
+	}
+
+	/**
+	 * changes the 2-D array of the board so that if the input
+	 * x and y are 1 square distance from the blank, the piece 
+	 * is moved to the blank.
+	 * note: only used for the puzzle game and does not check
+	 * 	     that the move is valid(doesn't go off board).
+	 *
+	 * @param i int x index on the board
+	 * @param j int y index on the board
+	 */ 
+	public void move(int i, int j) {
+		if (i == blank[0])
+			if (j == blank[1] + 1 || j == blank[1] - 1)
+				exch(blank[0], blank[1], i, j);
+
+		if (j == blank[1])
+			if (i == blank[0] + 1 || i == blank[0] - 1)
+				exch(blank[0], blank[1], i, j);
+	}
+
+	/**
+	 * returns the side length of the board
+	 *
+	 * @return int side length of board
+	 */
+	public int getLength() {
+		return length;
 	}
 					
 	/**
@@ -229,5 +249,27 @@ public class Board {
 		}
 
 		return result.toString();
+	}
+
+	public static void main(String[] args) {
+		int[][] board = new int[3][];
+
+		for (int i = 0; i < 3; i++)
+			board[i] = new int[3];
+
+		board[0][0] = 6;
+		board[0][1] = 0;
+		board[0][2] = 8;
+		board[1][0] = 4;
+		board[1][1] = 3;
+		board[1][2] = 5;
+		board[2][0] = 1;
+		board[2][1] = 2;
+		board[2][2] = 7;
+
+		Board test = new Board(board);
+
+		System.out.println(test);
+		System.out.println(test.twin());
 	}
 }

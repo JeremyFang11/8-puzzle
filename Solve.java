@@ -11,6 +11,7 @@
 
 import java.util.LinkedList;
 import java.util.Iterator;
+import java.util.Stack;
 
 public class Solve {
 
@@ -18,6 +19,8 @@ public class Solve {
 	 * in the normal board and the twin
 	 */ 
 	private LinkedList<Board> used, tused;
+	private boolean solvable;
+	private Stack<Board> sequence; // sequence of moves to reach solution(null if it does not exist)
 
 	/**
 	 * inner class represents search node when looking for solution.
@@ -47,8 +50,8 @@ public class Solve {
 		 * picked after other, if they are equal, 0 is returned and
 		 * if other has lower priority -1 is returned
 		 *
-		 * @param other State other board state
-		 * @return int compares this state and the input state
+		 * @param other State other board stat
+e		 * @return int compares this state and the input state
 		 */
 		public int compareTo(State other) {
 			int tprio = this.depth + this.board.manhattan();
@@ -77,6 +80,8 @@ public class Solve {
 
 		pq.add(new State(board, null, 0)); // add first board to the pq
 		tpq.add(new State(board.twin(), null, 0)); // add first twin board to the pq
+
+		sequence = new Stack<Board>();
 
 		/**
 		 * implementation of A* algorithm to find the shortest path from the input
@@ -119,7 +124,7 @@ public class Solve {
 			while (neighbors.hasNext()) {
 				Board checking = neighbors.next();
 
-				if (tmin.parent == null || min.parent.parent == null || !checking.equals(tmin.parent.parent.board))
+				if (tmin.parent == null || tmin.parent.parent == null || !checking.equals(tmin.parent.parent.board))
 					if (!tused.contains(checking))
 						tpq.add(new State(checking, tmin, depth + 1));
 			}
@@ -127,7 +132,53 @@ public class Solve {
 			tused.add(tmin.board);
 		}
 
-		System.out.println(min.board);
+		/**
+		 * boolean finds whether or not the initial board was solvable
+		 */
+		if (min.board.isGoal())
+			solvable = true;
+		else
+			solvable = false;
+
+		if (solvable == false) // if the board is not solvable, sequence is null
+			sequence = null;
+		else // if the board is solvable then the sequence is stored in a stack
+			while (min.board != board) {
+				sequence.add(min.board);
+				min = min.parent;
+			}
+
+		Stack<Board> tmp = new Stack<Board>();
+
+		/**
+		 * reverses the sequence of sequence stack so that
+		 * the solution is read from initial board to the goal
+		 * board
+		 */
+		while (!sequence.isEmpty())
+			tmp.push(sequence.pop());
+
+		sequence = tmp;
+	}
+
+	/**
+	 * returns whether or not the board was solvable
+	 *
+	 * @return boolean whether or not the board was solvable
+	 */
+	public boolean isSolvable() {
+		return solvable;
+	}
+
+	/**
+	 * returns an Iterable<Board> stack that contains the 
+	 * sequence of moves that need to be made to solve the puzzle
+	 *
+	 * @return Iterable<Board> stack that contains the moves needed to
+	 * 		   solve the puzzle(null if unsolvable)
+	 */
+	public Iterable<Board> getSequence() {
+		return sequence;
 	}
 
 	public static void main(String[] args) {
@@ -136,18 +187,22 @@ public class Solve {
 		for (int i = 0; i < 3; i++)
 			board[i] = new int[3];
 
-		board[0][0] = 8;
-		board[0][1] = 6;
-		board[0][2] = 7;
-		board[1][0] = 2;
-		board[1][1] = 5;
-		board[1][2] = 4;
-		board[2][0] = 3;
-		board[2][1] = 0;
-		board[2][2] = 1;
+		board[0][0] = 6;
+		board[0][1] = 0;
+		board[0][2] = 8;
+		board[1][0] = 4;
+		board[1][1] = 3;
+		board[1][2] = 5;
+		board[2][0] = 1;
+		board[2][1] = 2;
+		board[2][2] = 7;
 
 		Board test = new Board(board);
 		Solve t = new Solve(test);
 
+		Iterator<Board> s = t.getSequence().iterator();
+
+		while (s.hasNext())
+			System.out.println(s.next());
 	}
 }
