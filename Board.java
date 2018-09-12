@@ -258,7 +258,7 @@ public class Board {
 			board[i] = new int[3];
 
 		board[0][0] = 6;
-		board[0][1] = 0;
+		board[0][1] = 10;
 		board[0][2] = 8;
 		board[1][0] = 4;
 		board[1][1] = 3;

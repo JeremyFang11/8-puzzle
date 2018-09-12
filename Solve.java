@@ -148,17 +148,19 @@ e		 * @return int compares this state and the input state
 				min = min.parent;
 			}
 
-		Stack<Board> tmp = new Stack<Board>();
+		if (sequence != null) {
+			Stack<Board> tmp = new Stack<Board>();
 
-		/**
-		 * reverses the sequence of sequence stack so that
-		 * the solution is read from initial board to the goal
-		 * board
-		 */
-		while (!sequence.isEmpty())
-			tmp.push(sequence.pop());
+			/**
+		 	* reverses the sequence of sequence stack so that
+		 	* the solution is read from initial board to the goal
+		 	* board
+		 	*/
+			while (!sequence.isEmpty())
+				tmp.push(sequence.pop());
 
-		sequence = tmp;
+			sequence = tmp;
+		}
 	}
 
 	/**
