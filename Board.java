@@ -24,13 +24,8 @@ public class Board {
 	 * creates new instance of Board state
 	 * using 2-D array provided as input.
 	 * note : array is assumed to be square
-	 * note : board size cannot be under 3 or over 7
 	 */
 	public Board(int[][] board) {
-		if (board.length < 3 || board.length > 7)
-			throw new IllegalArgumentException("Error: No such thing as less than"
-				+ " 8-puzzle");
-
 		this.board = new int[board.length][];
 		length = board.length;
 		manhattanDistance = 0;
@@ -60,7 +55,6 @@ public class Board {
 	 * @return int distance from where the index is supposed to be
 	 */
 	private int distance(int x, int y) {
-
 		int val = board[x][y] - 1;
 		int i = 0;
 
@@ -274,28 +268,5 @@ public class Board {
 		}
 
 		return result.toString();
-	}
-
-	public static void main(String[] args) {
-		int[][] board = new int[3][];
-
-		for (int i = 0; i < 3; i++)
-			board[i] = new int[3];
-
-		board[0][0] = 5;
-		board[0][1] = 4;
-		board[0][2] = 8;
-		board[1][0] = 2;
-		board[1][1] = 0;
-		board[1][2] = 3;
-		board[2][0] = 7;
-		board[2][1] = 1;
-		board[2][2] = 6;
-
-		Board test = new Board(board);
-
-		test.move(0, 1);
-
-		System.out.println(test);
 	}
 }

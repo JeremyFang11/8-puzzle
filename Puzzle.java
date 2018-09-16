@@ -19,11 +19,13 @@ import java.util.Iterator;
 
 public class Puzzle {
 
+	private Scanner scan; // scanner used to take inputs
 	private int boardLength;
 	private Board board; // current board being used in game
-	private int moves;
+	private int moves, optimal; // number of moves taken and optimal number of moves to solve
 
 	public Puzzle(int length) {
+		scan = new Scanner(System.in);
 		boardLength = length;
 		moves = 0;
 	}
@@ -33,10 +35,15 @@ public class Puzzle {
 	 * a new random board)
 	 *
 	 */
-	public void reset() {
+	private void reset() {
 		board = generateBoardArray();
 		moves = 0;
-		System.out.println("[puzzle has been reset]");
+		System.out.print("[puzzle has been reset] Press enter to continue...");
+
+		scan.nextLine();
+
+		System.out.println("This is the new board and your moves have been reset.\n" +
+						   "moves = " + moves + "\n" + board);
 	}
 
 
@@ -82,26 +89,25 @@ public class Puzzle {
 	 * Allows user to play game.
 	 */
 	public void play() {
-		Scanner scan = new Scanner(System.in);
 		LinkedList<Integer> movesList; // LinkedList of available moves
 		Iterator<Integer> iterate; // iterator of available moves
 		Iterator<Board> solutionIterator; // iterator for sequence of moves to solution
 		boolean validMove = false, showSolution = false; // checks if move is valid every loop and check if the player gives up
 		int[] moveIndex;
 		Solve solution; // Solve class used to find solution
-		int moveMade = 0; // number at index to be swapped with blank
+		String moveMade = ""; // number at index to be swapped with blank
 
 		System.out.println("[8-Puzzle Game]");
 		System.out.print("press enter to start...");
 
 		scan.nextLine();
 
-		System.out.print("\nA board will now be generated. It will be represented by a 3x3 " +
-						   "square of numbers, with the '0' representing the blank space that " +
-						   "is moved around.\nEvery move, the number of moves you've made will be " +
-						   "displayed along with the number pieces that are movable with the current " +
-						   "state of the board.\nTo show shortest path from current board solution, " +
-						   "enter -1 as your move.\nPress enter to continue...");
+		System.out.print("\nA random SOLVABLE(don't be butthurt if you can't solve it) board will" + 
+						 "\nnow be generated. The 0 on the board will represent the blank space in" +
+						 "\nan actual 8-puzzle and the available pieces to move to that spot will be" +
+						 "\ndisplayed like '[5]' if you can move 5 to the blank. In addition to those" +
+						 " options,\n[0] = reset the game\n[-1] = show solution from current board\n" +
+						 "[-2] = exit program.\nPress enter to continue...");
 
 		board = generateBoardArray(); // generates new solvable board
 
@@ -111,32 +117,57 @@ public class Puzzle {
 		System.out.println("moves = 0\n" + board);
 
 		while (!board.isGoal() && !showSolution) {
-			System.out.println("The following moves are currently available, please enter the number " + 
-						   	   "corresponding to the move you want to make :");
-
 			validMove = false;
 			movesList = getMoves();
 
 			showMoves(movesList); // displays available moves
 
 			while (!validMove && !showSolution) { // continuous loop until a valid move is made
-				moveMade = Integer.parseInt(scan.nextLine());
+				moveMade = scan.nextLine();
 
-				if (moveMade == -1) 
-					showSolution = true;
-				else if (movesList.contains(moveMade)) {
-					System.out.print("A valid move [" + moveMade + "] has been made. Press enter to continue...");
-					validMove = true;
-				}
-				else {
-					System.out.println("[INVALID INPUT] Please enter one of the following valid moves :");
-					showMoves(movesList);
+				switch (moveMade) {
+					case "1":
+					case "2":
+					case "3":
+					case "4":
+					case "5":
+					case "6":
+					case "7":
+					case "8":
+					case "9":
+					case "0":
+					case "-1": 
+					case "-2":
+						int num = Integer.parseInt(moveMade);
+						if (num == -2)
+							exit();
+						else if (num == -1) {
+							showSolution = true;
+							break;
+						}
+						else if (num == 0) {
+							reset();
+							break;
+						}
+						else
+							if (movesList.contains(num)) {
+								validMove = true;
+								break;
+							}
+					default:
+						System.out.println("[INVALID INPUT] Please input a valid move.");
+						showMoves(movesList);
 				}
 			}
 
+			/**
+			 * Code that actually makes the move in the board and increments the number
+			 * of moves made thus far
+			 */
 			if (!showSolution) {
-				moveIndex = convertNumberToIndexes(moveMade); // gets indexes for the piece that is being moved
+				moveIndex = convertNumberToIndexes(Integer.parseInt(moveMade)); // gets indexes for the piece that is being moved
 
+				System.out.print("Moving " + moveMade + " to blank space. Press enter to continue...");
 				scan.nextLine();
 
 				board.move(moveIndex[0], moveIndex[1]); // moves the piece represented by moveIndex to the blank space
@@ -146,6 +177,7 @@ public class Puzzle {
 			}
 		}
 
+		// finds the shortest path from the current board to the goal board
 		if (showSolution) {
 			solution = new Solve(board);
 			solutionIterator = solution.getSequence().iterator();
@@ -158,7 +190,12 @@ public class Puzzle {
 				System.out.println("moves = " + moves + "\n" + solutionIterator.next());
 				moves++;
 			}
+
+			System.out.println("Yikes, couldn't finish the puzzle :/");
 		}
+		else
+			System.out.println("Congrats on finishing the puzzle, you took " + (moves - optimal)
+							    + " moves more than the optimal solution");
 	}
 
 	/**
@@ -187,11 +224,13 @@ public class Puzzle {
 	private void showMoves(LinkedList<Integer> list) {
 		StringBuilder result = new StringBuilder();
 		Iterator<Integer> iterate = list.iterator();
-
+		String brk =new String(new char[65]).replace("\0", "-");
 		while (iterate.hasNext())
 			result.append(" [" + iterate.next() + "]\t");
 
-		System.out.println(result.toString());
+		System.out.println(brk);
+		System.out.println(result.toString() + " ||\t[-2] \t [-1] \t  [0]");
+		System.out.println(brk);
 	}
 
 	/**
@@ -249,6 +288,14 @@ public class Puzzle {
 			}
 
 		return indexes;
+	}
+
+	/**
+	 * exits the program
+	 */
+	private void exit() {
+		System.out.println("Ending program.");
+		System.exit(0);
 	}
 
 	public static void main(String[] args) {
